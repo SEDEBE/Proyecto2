@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Clima con Meteosat API</title>
+  </head>
+  <body>
+    <h1>Pronóstico del tiempo</h1>
+    <p>Introduce una ciudad para ver el clima:</p>
+    <input type="text" id="city" placeholder="Ciudad" />
+    <button onclick="getWeather()">Obtener clima</button>
+
+    <div id="result"></div>
+
+    <script>
+      function getWeather() {
+        const city = document.getElementById("city").value; // Obtener la ciudad ingresada
+        const apiKey = "c544121e37msh723e20944387174p17c58bjsn61ece3a940a8"; // Tu clave API
+        const lat = 40.4168; // Latitud de Madrid
+        const lon = -3.7038; // Longitud de Madrid
+        const url = `https://meteosat.p.rapidapi.com/point/monthly?lat=${lat}&lon=${lon}&alt=43&start=2023-12-01&end=2023-12-31`; // URL de la API de Meteosat
+
+        // Hacemos la solicitud a la API
+        fetch(url, {
+          method: "GET",
+          headers: {
+            "x-rapidapi-key": apiKey, // Usamos nuestra clave API
+            "x-rapidapi-host": "meteosat.p.rapidapi.com", // Nombre del host de la API
+          },
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            console.log(data); // Imprimir la respuesta completa en la consola
+            const resultDiv = document.getElementById("result");
+
+            // Verifica la estructura de los datos de la respuesta
+            if (data && data.data && data.data.length > 0) {
+              const weather = data.data[0].weather || "No disponible"; // Obtener clima
+              const temperature =
+                data.data[0].temperature_2m_max || "No disponible"; // Obtener temperatura máxima
+
+              // Mostrar los resultados en la página
+              resultDiv.innerHTML = `<h2>Clima en ${city}</h2>
+                                  <p>Clima: ${weather}</p>
+                                  <p>Temperatura máxima: ${temperature}°C</p>`;
+            } else {
+              resultDiv.innerHTML = `<p>No se pudo obtener el clima para ${city}. Por favor, intenta de nuevo.</p>`;
+            }
+          })
+          .catch((error) => {
+            console.error("Error:", error);
+            alert("Ocurrió un error al obtener los datos.");
+          });
+      }
+    </script>
+  </body>
+</html>
